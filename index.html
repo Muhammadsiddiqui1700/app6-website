@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Application 6 – Project Demo</title>
+  <title>Application 6 – VitalLink Patient Monitor</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
     body {
@@ -32,18 +32,23 @@
   </style>
 </head>
 <body>
-  <h1>Application 6: [Your Project Title]</h1>
+  <h1>Application 6: VitalLink Patient Monitor (ESP32 + FreeRTOS)</h1>
 
   <p>
-    <strong>Author:</strong> [Your Name]<br>
-    <strong>Course:</strong> [Course Name / Number]<br>
-    <strong>Date:</strong> [Month Day, Year]
+    <strong>Author:</strong> Muhammad Siddiqui<br>
+    <strong>Course:</strong> EEL 5862 Real Time Systems<br>
+    <strong>Date:</strong> Dec 5, 2025
   </p>
 
   <h2>Project Overview</h2>
   <p>
-    [Write 3–6 sentences explaining what your project does, who it’s for, and what someone
-    will see in the demo. Keep it simple and non-technical.]
+    VitalLink Health is a Central Florida healthcare startup focused on real-time patient
+    monitoring systems. Its mission is to deliver safe, responsive embedded devices that
+    track vital signs and trigger alarms instantly when anomalies occur. Real-time software
+    is critical in this domain because missing a deadline can directly endanger patient
+    safety. By building a proof-of-concept on ESP32 with FreeRTOS, this project shows that
+    timing guarantees can be met even under variable workloads, ensuring both correctness
+    and responsiveness.
   </p>
 
   <h2>Demo Video</h2>
@@ -68,9 +73,44 @@
 
   <h2>Key Features</h2>
   <ul>
-    <li>[Feature 1 – short phrase + one sentence]</li>
-    <li>[Feature 2 – short phrase + one sentence]</li>
-    <li>[Feature 3 – short phrase + one sentence]</li>
+    <li>
+      <strong>Real-time vital sign prototype:</strong>
+      Uses an ESP32 microcontroller to model heart rate (potentiometer/ADC) and body
+      temperature (DHT22 sensor) as patient vitals that are sampled on a strict schedule.
+    </li>
+    <li>
+      <strong>Safety-first alarm path:</strong>
+      A red alarm LED is driven by hard real-time tasks that check heart rate and
+      temperature against safe thresholds every 50&nbsp;ms, with a physical pushbutton
+      that acknowledges and clears alarms through an interrupt.
+    </li>
+    <li>
+      <strong>Deterministic scheduling with FreeRTOS:</strong>
+      SensorRead, ComputeVitals, and Alarm run as high-priority “hard” tasks with
+      10&nbsp;ms, 20&nbsp;ms, and 50&nbsp;ms periods, while lower-priority “soft” tasks handle
+      telemetry logging, a heartbeat LED, and temperature updates without disturbing
+      the critical path.
+    </li>
+    <li>
+      <strong>Overload and jitter testing:</strong>
+      A configurable filter window in <code>variableFilterBPM</code> increases compute load to
+      emulate worst-case noise and CPU stress, demonstrating that safety-critical tasks
+      still meet their deadlines even when background work becomes heavier.
+    </li>
+    <li>
+      <strong>Race-free shared data:</strong>
+      Shared vital signs live in a <code>gVitals</code> structure protected by a mutex, a single-slot
+      queue always holds the latest sensor sample, and critical sections in the
+      acknowledge interrupt keep counters consistent across cores, eliminating race
+      conditions between concurrent tasks and ISRs.
+    </li>
+    <li>
+      <strong>Lean critical path design:</strong>
+      Slow DHT22 temperature reads were moved out of the 10&nbsp;ms sensor loop into a
+      separate soft task running once per second, preserving tight timing guarantees
+      for heart-rate-driven alarms while still providing clinically useful temperature
+      data.
+    </li>
   </ul>
 </body>
 </html>
